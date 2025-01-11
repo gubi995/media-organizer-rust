@@ -1,0 +1,8 @@
+[package]
+name = "media-organizer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.24", features = ["derive"] }
+nom-exif = "2.2.1"
