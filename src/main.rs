@@ -114,8 +114,7 @@ fn determine_subfolder_name_from_metadata(
     logger: &Logger,
     path: std::path::PathBuf,
 ) -> Option<String> {
-    let destination_subfolder_name: String;
-
+    let mut destination_subfolder_name = "NOT_QUALIFIED".to_owned();
     let mut parser = MediaParser::new();
     let media_source = match MediaSource::file_path(path) {
         Ok(source) => source,
@@ -132,7 +131,8 @@ fn determine_subfolder_name_from_metadata(
             Ok(iter) => iter,
             Err(error) => {
                 logger.warning(format!("Failed parsing Exif data. Details: {error}"));
-                return None;
+
+                return Some(destination_subfolder_name);
             }
         };
 
@@ -148,22 +148,20 @@ fn determine_subfolder_name_from_metadata(
                 logger.warning(
                     "Failed reading Exif data. Details: No DateTimeOriginal or CreateDate tag found.".to_owned(),
                 );
-                return None;
+
+                return Some(destination_subfolder_name);
             }
         };
         let exif_data = exif_entry.get_value().unwrap().as_time();
 
-        destination_subfolder_name = exif_data
-            .unwrap()
-            .date_naive()
-            .format("%Y-%m-%d")
-            .to_string();
+        destination_subfolder_name = exif_data.unwrap().date_naive().format("%Y").to_string();
     } else if media_source.has_track() {
         let info: TrackInfo = match parser.parse(media_source) {
             Ok(info) => info,
             Err(error) => {
                 logger.warning(format!("Failed parsing track data. Details: {error}"));
-                return None;
+
+                return Some(destination_subfolder_name);
             }
         };
         let track_data = info.get(nom_exif::TrackInfoTag::CreateDate).unwrap();
@@ -172,12 +170,10 @@ fn determine_subfolder_name_from_metadata(
             .as_time()
             .unwrap()
             .date_naive()
-            .format("%Y-%m-%d")
+            .format("%Y")
             .to_string();
     } else {
         logger.warning("No Exif or Track data found so skipping the current file.".to_owned());
-
-        destination_subfolder_name = "unknown".to_owned();
     }
 
     Some(destination_subfolder_name)
