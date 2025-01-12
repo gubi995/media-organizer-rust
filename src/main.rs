@@ -146,7 +146,7 @@ fn determine_subfolder_name_from_metadata(
             Some(entry) => entry,
             None => {
                 logger.warning(
-                    "Failed reading Exif data. Details: No DateTimeOriginal tag found.".to_owned(),
+                    "Failed reading Exif data. Details: No DateTimeOriginal or CreateDate tag found.".to_owned(),
                 );
                 return None;
             }
