@@ -136,8 +136,12 @@ fn determine_subfolder_name_from_metadata(
             }
         };
 
-        let exif_entry =
-            iter.find(|entry| entry.tag() == Some(nom_exif::ExifTag::DateTimeOriginal));
+        let exif_entry = iter.find(|entry| {
+            matches!(
+                entry.tag(),
+                Some(nom_exif::ExifTag::DateTimeOriginal | nom_exif::ExifTag::CreateDate)
+            )
+        });
         let exif_entry = match exif_entry {
             Some(entry) => entry,
             None => {
