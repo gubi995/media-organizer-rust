@@ -122,7 +122,7 @@ fn determine_subfolder_name_from_metadata(
             logger.warning(format!(
                 "Couldn't get metadata of the file so skipping it. Details: {error}"
             ));
-            return None;
+            return Some(destination_subfolder_name);
         }
     };
 
